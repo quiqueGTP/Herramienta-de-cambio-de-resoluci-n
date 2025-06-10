@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cambiador de Resolución de Imagen</title>
+  <style>
+    :root {
+      --primary: #5b5bff;
+      --bg: #f5f5f5;
+      --card-bg: #ffffff;
+      --btn-bg: #e0e0e0;
+      --btn-active-bg: var(--primary);
+      --btn-color: #333;
+      --btn-active-color: #fff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      background-color: var(--bg);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+    .container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      padding: 24px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 16px;
+      font-size: 1.5rem;
+      color: #222;
+    }
+    .image-wrapper {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      padding: 6px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+    }
+    .image-wrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 10px;
+      background: #fff;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .buttons button {
+      flex: 1 1 30%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: var(--btn-bg);
+      color: var(--btn-color);
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .3s;
+      min-width: 80px;
+    }
+    .buttons button.active,
+    .buttons button:hover {
+      background: var(--btn-active-bg);
+      color: var(--btn-active-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cambiador de Resolución</h1>
+    <div class="image-wrapper">
+      <img id="resizable-image" src="https://veritascr.instructure.com/files/2660254/download?download_frd=1" alt="Imagen a redimensionar">
+    </div>
+    <div class="buttons">
+      <button data-height="120">120p</button>
+      <button data-height="480">480p</button>
+      <button data-height="720">HD</button>
+      <button data-height="1080">Full HD</button>
+      <button data-height="2160">4K</button>
+    </div>
+  </div>
+
+  <script>
+    const img = new Image();
+    const displayImg = document.getElementById('resizable-image');
+    const buttons = document.querySelectorAll('.buttons button');
+    // Carga de la imagen original para canvas
+    img.crossOrigin = 'Anonymous';
+    img.src = displayImg.src;
+    img.onload = () => {
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Marcar activo
+          buttons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          // Calcular nuevas dimensiones
+          const newH = parseInt(btn.dataset.height);
+          const aspect = img.width / img.height;
+          const newW = Math.round(newH * aspect);
+          // Redimensionar con canvas
+          const canvas = document.createElement('canvas');
+          canvas.width = newW;
+          canvas.height = newH;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, newW, newH);
+          // Actualizar imagen mostrada
+          displayImg.src = canvas.toDataURL();
+        });
+      });
+      // Activar opción predeterminada
+      buttons[1].click();
+    };
+  </script>
+</body>
+</html>
